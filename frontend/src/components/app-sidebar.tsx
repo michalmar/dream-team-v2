@@ -75,7 +75,7 @@ const data = {
     },
     {
       teamId: "team-6",
-      name: "Retail - Customer Segmentation",
+      name: "Retail Analysis",
       logo: ShoppingBasket,
       plan: "Inventory analysis.",
       agents: agentsTeamRetail1,
