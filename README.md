@@ -52,6 +52,15 @@ azd auth login
 azd up
 ```
 
+# Notes 
+
+- while using Web Surfer agent, you might want to change Content Safety on Azure OpenAI to accomodate your needs
+- currently it is "bring your own AI Search" (BYOS) - since its assuming you have your own search engine, we are working on a solution to make it easier for you
+   - you must add two ENV variables to backend service to connect to your search engine
+   - `AZURE_SEARCH_SERVICE_ENDPOINT` - your search engine endpoint
+   - `AZURE_SEARCH_ADMIN_KEY` - your search engine key (we are working to enable managed identity for this service)
+ 
+
 # Working locally  
 
 There are two parts to this project: the backend and the frontend. The backend is written in Python, and the frontend is written in JavaScript using React.
