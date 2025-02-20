@@ -10,6 +10,7 @@ import {
   PieChart,
   Settings2,
   ShieldAlert,
+  ShoppingBasket,
   SquareTerminal,
   Wrench,
 } from "lucide-react"
@@ -24,7 +25,7 @@ import {
 } from "@/components/ui/sidebar"
 import h1 from '@/assets/h1.png';
 
-import { agentsTeam1, agentsTeam2, agentsTeam3, agentsTeam4, agentsTeamFSI1 } from '@/components/agents-definition';
+import { agentsTeam1, agentsTeam2, agentsTeam3, agentsTeam4, agentsTeamFSI1, agentsTeamRetail1 } from '@/components/agents-definition';
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   onTeamSelect: (team: { teamId: string; agents: any[] }) => void;
@@ -71,6 +72,13 @@ const data = {
       logo: DollarSign,
       plan: "Loan upsell scenario by analyzing financial transaction ",
       agents: agentsTeamFSI1,
+    },
+    {
+      teamId: "team-6",
+      name: "Retail - Customer Segmentation",
+      logo: ShoppingBasket,
+      plan: "Inventory analysis.",
+      agents: agentsTeamRetail1,
     },
   ],
   navMain: [

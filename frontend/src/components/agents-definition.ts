@@ -44,6 +44,15 @@ export const getAvatarSrc = (user: string) => {
       case 'CreditOpportunityRecommender'.toLocaleLowerCase():
           return lAnalyzer;
       default:
+        if (user.toLowerCase().includes('rag')) {
+          return lRag;
+        }
+        if (user.toLowerCase().includes('analyzer')) {
+          return lAnalyzer;
+        }
+        if (user.toLowerCase().includes('monitor')) {
+          return lSensor;
+        }
         return 'https://example.com/default.png';
     }
   };
@@ -892,6 +901,370 @@ Reply "TERMINATE" in the end when everything is done.
       index_name:""
       },
 ];
+
+
+// FSI - Upsell scenario
+export const agentsTeamRetail1: Agent[] = [
+  {
+    input_key: "0001",
+    type: "MagenticOne",
+    name: "Coder",
+    system_message: "",
+    description: "",
+    icon: "👨‍💻",
+    index_name: ""
+  },
+  {
+    input_key: "0002",
+    type: "MagenticOne",
+    name: "Executor",
+    system_message: "",
+    description: "",
+    icon: "💻",
+    index_name: ""
+  },
+  {
+    input_key: "0003",
+    type: "MagenticOne",
+    name: "FileSurfer",
+    system_message: "",
+    description: "",
+    icon: "📂",
+    index_name: ""
+  },
+  {
+    input_key: "0004",
+    type: "MagenticOne",
+    name: "WebSurfer",
+    system_message: "",
+    description: "",
+    icon: "🏄‍♂️",
+    index_name: ""
+  },
+  {
+    input_key:"0005",
+    type:"Custom",
+    name:"InventoryMonitor",
+    system_message:`
+You are Inventory Monitor. Your primary responsibility is to continuously analyze real‑time inventory data for cinema concessions. Monitor stock levels against the reorder points provided in the inventory table. Flag any items where current inventory is at or below the reorder threshold. Always reference the Microsoft Dynamics 365 Retail Inventory & Supply Chain Optimization Best Practices Guide 2024 to ensure optimal restocking strategies. 
+
+Datasets
+
+You are provided with detailed datasets. Your task is to analyze these datasets.
+
+### Dataset 1: Inventory data
+
+| Timestamp           | Location  | ItemID | ItemName           | CurrentInventory | ReorderPoint | LeadTimeDays |  
+|---------------------|-----------|--------|---------------------|------------------|--------------|---------------|  
+| 2024-06-01 10:00    | Cinema A1 | POP001 | Popcorn (Large)     | 120              | 100          | 22            |  
+| 2024-06-01 10:00    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 200              | 180          | 12            |  
+| 2024-06-01 10:00    | Cinema A1 | CND001 | Candy Mix           | 80               | 75           | 3             |  
+| 2024-06-01 10:00    | Cinema A1 | NCH001 | Nachos              | 45               | 50           | 22            |  
+| 2024-06-01 10:00    | Cinema A1 | HOT001 | Hotdog              | 60               | 55           | 22            |  
+| 2024-06-01 10:05    | Cinema A1 | POP001 | Popcorn (Large)     | 115              | 100          | 22            |  
+| 2024-06-01 10:05    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 195              | 180          | 12            |  
+| 2024-06-01 10:05    | Cinema A1 | CND001 | Candy Mix           | 78               | 75           | 3             |  
+| 2024-06-01 10:05    | Cinema A1 | NCH001 | Nachos              | 47               | 50           | 22            |  
+| 2024-06-01 10:05    | Cinema A1 | HOT001 | Hotdog              | 62               | 55           | 22            |  
+| 2024-06-01 10:10    | Cinema A1 | POP001 | Popcorn (Large)     | 110              | 100          | 22            |  
+| 2024-06-01 10:10    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 190              | 180          | 12            |  
+| 2024-06-01 10:10    | Cinema A1 | CND001 | Candy Mix           | 76               | 75           | 3             |  
+| 2024-06-01 10:10    | Cinema A1 | NCH001 | Nachos              | 46               | 50           | 22            |  
+| 2024-06-01 10:10    | Cinema A1 | HOT001 | Hotdog              | 64               | 55           | 22            |  
+| 2024-06-01 10:15    | Cinema A1 | POP001 | Popcorn (Large)     | 105              | 100          | 22            |  
+| 2024-06-01 10:15    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 185              | 180          | 12            |  
+| 2024-06-01 10:15    | Cinema A1 | CND001 | Candy Mix           | 74               | 75           | 3             |  
+| 2024-06-01 10:15    | Cinema A1 | NCH001 | Nachos              | 44               | 50           | 22            |  
+| 2024-06-01 10:15    | Cinema A1 | HOT001 | Hotdog              | 66               | 55           | 22            |  
+| 2024-06-01 10:20    | Cinema A1 | POP001 | Popcorn (Large)     | 95               | 100          | 22            |  
+| 2024-06-01 10:20    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 180              | 180          | 12            |  
+| 2024-06-01 10:20    | Cinema A1 | CND001 | Candy Mix           | 72               | 75           | 3             |  
+| 2024-06-01 10:20    | Cinema A1 | NCH001 | Nachos              | 42               | 50           | 22            |  
+| 2024-06-01 10:20    | Cinema A1 | HOT001 | Hotdog              | 68               | 55           | 22            |  
+| 2024-06-01 10:25    | Cinema A1 | POP001 | Popcorn (Large)     | 90               | 100          | 22            |  
+| 2024-06-01 10:25    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 175              | 180          | 12            |  
+| 2024-06-01 10:25    | Cinema A1 | CND001 | Candy Mix           | 70               | 75           | 3             |  
+| 2024-06-01 10:25    | Cinema A1 | NCH001 | Nachos              | 40               | 50           | 22            |  
+| 2024-06-01 10:25    | Cinema A1 | HOT001 | Hotdog              | 70               | 55           | 22            |  
+| 2024-06-01 10:30    | Cinema A1 | POP001 | Popcorn (Large)     | 85               | 100          | 22            |  
+| 2024-06-01 10:30    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 170              | 180          | 12            |  
+| 2024-06-01 10:30    | Cinema A1 | CND001 | Candy Mix           | 68               | 75           | 3             |  
+| 2024-06-01 10:30    | Cinema A1 | NCH001 | Nachos              | 38               | 50           | 22            |  
+| 2024-06-01 10:30    | Cinema A1 | HOT001 | Hotdog              | 72               | 55           | 22            |  
+| 2024-06-01 10:35    | Cinema A1 | POP001 | Popcorn (Large)     | 80               | 100          | 22            |  
+| 2024-06-01 10:35    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 165              | 180          | 12            |  
+| 2024-06-01 10:35    | Cinema A1 | CND001 | Candy Mix           | 66               | 75           | 3             |  
+| 2024-06-01 10:35    | Cinema A1 | NCH001 | Nachos              | 36               | 50           | 22            |  
+| 2024-06-01 10:35    | Cinema A1 | HOT001 | Hotdog              | 74               | 55           | 22            |  
+| 2024-06-01 10:40    | Cinema A1 | POP001 | Popcorn (Large)     | 75               | 100          | 22            |  
+| 2024-06-01 10:40    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 160              | 180          | 12            |  
+| 2024-06-01 10:40    | Cinema A1 | CND001 | Candy Mix           | 64               | 75           | 3             |  
+| 2024-06-01 10:40    | Cinema A1 | NCH001 | Nachos              | 34               | 50           | 22            |  
+| 2024-06-01 10:40    | Cinema A1 | HOT001 | Hotdog              | 76               | 55           | 22            |  
+| 2024-06-01 10:45    | Cinema A1 | POP001 | Popcorn (Large)     | 70               | 100          | 22            |  
+| 2024-06-01 10:45    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 155              | 180          | 12            |  
+| 2024-06-01 10:45    | Cinema A1 | CND001 | Candy Mix           | 62               | 75           | 3             |  
+| 2024-06-01 10:45    | Cinema A1 | NCH001 | Nachos              | 32               | 50           | 22            |  
+| 2024-06-01 10:45    | Cinema A1 | HOT001 | Hotdog              | 78               | 55           | 22            |  
+| 2024-06-01 10:50    | Cinema A1 | POP001 | Popcorn (Large)     | 65               | 100          | 22            |  
+| 2024-06-01 10:50    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 150              | 180          | 12            |  
+| 2024-06-01 10:50    | Cinema A1 | CND001 | Candy Mix           | 60               | 75           | 3             |  
+| 2024-06-01 10:50    | Cinema A1 | NCH001 | Nachos              | 30               | 50           | 22            |  
+| 2024-06-01 10:50    | Cinema A1 | HOT001 | Hotdog              | 80               | 55           | 22            |  
+| 2024-06-01 10:55    | Cinema A1 | POP001 | Popcorn (Large)     | 60               | 100          | 22            |  
+| 2024-06-01 10:55    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 145              | 180          | 12            |  
+| 2024-06-01 10:55    | Cinema A1 | CND001 | Candy Mix           | 58               | 75           | 3             |  
+| 2024-06-01 10:55    | Cinema A1 | NCH001 | Nachos              | 28               | 50           | 22            |  
+| 2024-06-01 10:55    | Cinema A1 | HOT001 | Hotdog              | 82               | 55           | 22            |  
+| 2024-06-01 11:00    | Cinema A1 | POP001 | Popcorn (Large)     | 55               | 100          | 22            |  
+| 2024-06-01 11:00    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 140              | 180          | 12            |  
+| 2024-06-01 11:00    | Cinema A1 | CND001 | Candy Mix           | 56               | 75           | 3             |  
+| 2024-06-01 11:00    | Cinema A1 | NCH001 | Nachos              | 26               | 50           | 22            |  
+| 2024-06-01 11:00    | Cinema A1 | HOT001 | Hotdog              | 84               | 55           | 2             |  
+
+### Dataset 2: Sales data
+| Timestamp           | Location   | ItemID | ItemName            | UnitsSold | SalesPrice | TransactionCount |  
+|---------------------|------------|--------|---------------------|-----------|------------|-------------------|  
+| 2024-06-01 10:00    | Cinema A1  | POP001 | Popcorn (Large)     | 15        | 8.50       | 520               |  
+| 2024-06-01 10:00    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 25        | 3.00       | 820               |  
+| 2024-06-01 10:00    | Cinema A1  | CND001 | Candy Mix           | 10        | 4.00       | 320               |  
+| 2024-06-01 10:00    | Cinema A1  | NCH001 | Nachos              | 5         | 6.50       | 220               |  
+| 2024-06-01 10:00    | Cinema A1  | HOT001 | Hotdog              | 7         | 5.50       | 320               |  
+| 2024-06-01 10:05    | Cinema A1  | POP001 | Popcorn (Large)     | 13        | 8.50       | 420               |  
+| 2024-06-01 10:05    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 22        | 3.00       | 720               |  
+| 2024-06-01 10:05    | Cinema A1  | CND001 | Candy Mix           | 12        | 4.00       | 420               |  
+| 2024-06-01 10:05    | Cinema A1  | NCH001 | Nachos              | 6         | 6.50       | 220               |  
+| 2024-06-01 10:05    | Cinema A1  | HOT001 | Hotdog              | 8         | 5.50       | 320               |  
+| 2024-06-01 10:10    | Cinema A1  | POP001 | Popcorn (Large)     | 20        | 8.50       | 720               |  
+| 2024-06-01 10:10    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 30        | 3.00       | 1020              |  
+| 2024-06-01 10:10    | Cinema A1  | CND001 | Candy Mix           | 15        | 4.00       | 520               |  
+| 2024-06-01 10:10    | Cinema A1  | NCH001 | Nachos              | 8         | 6.50       | 320               |  
+| 2024-06-01 10:10    | Cinema A1  | HOT001 | Hotdog              | 10        | 5.50       | 420               |  
+| 2024-06-01 10:15    | Cinema A1  | POP001 | Popcorn (Large)     | 18        | 8.50       | 620               |  
+| 2024-06-01 10:15    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 28        | 3.00       | 920               |  
+| 2024-06-01 10:15    | Cinema A1  | CND001 | Candy Mix           | 14        | 4.00       | 420               |  
+| 2024-06-01 10:15    | Cinema A1  | NCH001 | Nachos              | 7         | 6.50       | 320               |  
+| 2024-06-01 10:15    | Cinema A1  | HOT001 | Hotdog              | 9         | 5.50       | 320               |  
+| 2024-06-01 10:20    | Cinema A1  | POP001 | Popcorn (Large)     | 12        | 8.50       | 520               |  
+| 2024-06-01 10:20    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 26        | 3.00       | 820               |  
+| 2024-06-01 10:20    | Cinema A1  | CND001 | Candy Mix           | 10        | 4.00       | 320               |  
+| 2024-06-01 10:20    | Cinema A1  | NCH001 | Nachos              | 4         | 6.50       | 220               |  
+| 2024-06-01 10:20    | Cinema A1  | HOT001 | Hotdog              | 6         | 5.50       | 320               |  
+| 2024-06-01 10:25    | Cinema A1  | POP001 | Popcorn (Large)     | 10        | 8.50       | 420               |  
+| 2024-06-01 10:25    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 24        | 3.00       | 720               |  
+| 2024-06-01 10:25    | Cinema A1  | CND001 | Candy Mix           | 8         | 4.00       | 320               |  
+| 2024-06-01 10:25    | Cinema A1  | NCH001 | Nachos              | 3         | 6.50       | 220               |  
+| 2024-06-01 10:25    | Cinema A1  | HOT001 | Hotdog              | 5         | 5.50       | 220               |  
+| 2024-06-01 10:30    | Cinema A1  | POP001 | Popcorn (Large)     | 8         | 8.50       | 320               |  
+| 2024-06-01 10:30    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 22        | 3.00       | 720               |  
+| 2024-06-01 10:30    | Cinema A1  | CND001 | Candy Mix           | 7         | 4.00       | 320               |  
+| 2024-06-01 10:30    | Cinema A1  | NCH001 | Nachos              | 4         | 6.50       | 220               |  
+| 2024-06-01 10:30    | Cinema A1  | HOT001 | Hotdog              | 6         | 5.50       | 320               |  
+| 2024-06-01 10:35    | Cinema A1  | POP001 | Popcorn (Large)     | 6         | 8.50       | 320               |  
+| 2024-06-01 10:35    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 20        | 3.00       | 620               |  
+| 2024-06-01 10:35    | Cinema A1  | CND001 | Candy Mix           | 6         | 4.00       | 220               |  
+| 2024-06-01 10:35    | Cinema A1  | NCH001 | Nachos              | 3         | 6.50       | 220               |  
+| 2024-06-01 10:35    | Cinema A1  | HOT001 | Hotdog              | 5         | 5.50       | 220               |  
+| 2024-06-01 10:40    | Cinema A1  | POP001 | Popcorn (Large)     | 5         | 8.50       | 220               |  
+| 2024-06-01 10:40    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 18        | 3.00       | 620               |  
+| 2024-06-01 10:40    | Cinema A1  | CND001 | Candy Mix           | 5         | 4.00       | 220               |  
+| 2024-06-01 10:40    | Cinema A1  | NCH001 | Nachos              | 3         | 6.50       | 220               |  
+| 2024-06-01 10:40    | Cinema A1  | HOT001 | Hotdog              | 4         | 5.50       | 220               |  
+| 2024-06-01 10:45    | Cinema A1  | POP001 | Popcorn (Large)     | 4         | 8.50       | 220               |  
+| 2024-06-01 10:45    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 16        | 3.00       | 520               |  
+| 2024-06-01 10:45    | Cinema A1  | CND001 | Candy Mix           | 4         | 4.00       | 220               |  
+| 2024-06-01 10:45    | Cinema A1  | NCH001 | Nachos              | 2         | 6.50       | 120               |  
+| 2024-06-01 10:45    | Cinema A1  | HOT001 | Hotdog              | 3         | 5.50       | 120               |  
+| 2024-06-01 10:50    | Cinema A1  | POP001 | Popcorn (Large)     | 3         | 8.50       | 120               |  
+| 2024-06-01 10:50    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 15        | 3.00       | 520               |  
+| 2024-06-01 10:50    | Cinema A1  | CND001 | Candy Mix           | 3         | 4.00       | 120               |  
+| 2024-06-01 10:50    | Cinema A1  | NCH001 | Nachos              | 2         | 6.50       | 120               |  
+| 2024-06-01 10:50    | Cinema A1  | HOT001 | Hotdog              | 3         | 5.50       | 120               |  
+| 2024-06-01 10:55    | Cinema A1  | POP001 | Popcorn (Large)     | 2         | 8.50       | 120               |  
+| 2024-06-01 10:55    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 14        | 3.00       | 520               |  
+| 2024-06-01 10:55    | Cinema A1  | CND001 | Candy Mix           | 2         | 4.00       | 120               |  
+| 2024-06-01 10:55    | Cinema A1  | NCH001 | Nachos              | 1         | 6.50       | 120               |  
+| 2024-06-01 10:55    | Cinema A1  | HOT001 | Hotdog              | 2         | 5.50       | 120               |  
+| 2024-06-01 11:00    | Cinema A1  | POP001 | Popcorn (Large)     | 2         | 8.50       | 120               |  
+| 2024-06-01 11:00    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 13        | 3.00       | 420               |  
+| 2024-06-01 11:00    | Cinema A1  | CND001 | Candy Mix           | 2         | 4.00       | 120               |  
+| 2024-06-01 11:00    | Cinema A1  | NCH001 | Nachos              | 1         | 6.50       | 120               |  
+| 2024-06-01 11:00    | Cinema A1  | HOT001 | Hotdog              | 2         | 5.50       | 120               |  
+
+Reply "TERMINATE" in the end when everything is done.
+`,
+    description:" Inventory Monitor. Your primary responsibility is to continuously analyze real‑time inventory data for cinema concessions. This agent has all data available.",
+    icon:"🎻",
+    index_name:""
+    },
+  {
+    input_key:"0006",
+    type:"RAG",
+    name:"RetailRAG",
+    system_message:"",
+    description:"An agent that has access to internal index and can handle RAG tasks, call this agent if you are getting questions on Best Practices for implementing Dynamics 365 Supply Chaing management, etc..",
+    icon:"📖",
+    index_name:"ag-demo-retail"
+    },
+    {
+      input_key:"0007",
+      type:"Custom",
+      name:"SalesAnalyzer",
+      system_message:`
+You are Sales Analyzer. Your task is to process real‑time sales data from cinema concessions and detect trends in product demand. Compare units sold, transaction counts, and sales prices to forecast future demand. Collaborate with Inventory Monitor to recommend dynamic restocking schedules and order quantities. Additionally, use current supply chain news from our web surfer agent to adjust recommendations for any external factors affecting lead times or inventory replenishment.
+
+Datasets
+
+You are provided with detailed datasets. Your task is to analyze these datasets.
+
+### Dataset 1: Inventory data
+
+| Timestamp           | Location  | ItemID | ItemName           | CurrentInventory | ReorderPoint | LeadTimeDays |  
+|---------------------|-----------|--------|---------------------|------------------|--------------|---------------|  
+| 2024-06-01 10:00    | Cinema A1 | POP001 | Popcorn (Large)     | 120              | 100          | 22            |  
+| 2024-06-01 10:00    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 200              | 180          | 12            |  
+| 2024-06-01 10:00    | Cinema A1 | CND001 | Candy Mix           | 80               | 75           | 3             |  
+| 2024-06-01 10:00    | Cinema A1 | NCH001 | Nachos              | 45               | 50           | 22            |  
+| 2024-06-01 10:00    | Cinema A1 | HOT001 | Hotdog              | 60               | 55           | 22            |  
+| 2024-06-01 10:05    | Cinema A1 | POP001 | Popcorn (Large)     | 115              | 100          | 22            |  
+| 2024-06-01 10:05    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 195              | 180          | 12            |  
+| 2024-06-01 10:05    | Cinema A1 | CND001 | Candy Mix           | 78               | 75           | 3             |  
+| 2024-06-01 10:05    | Cinema A1 | NCH001 | Nachos              | 47               | 50           | 22            |  
+| 2024-06-01 10:05    | Cinema A1 | HOT001 | Hotdog              | 62               | 55           | 22            |  
+| 2024-06-01 10:10    | Cinema A1 | POP001 | Popcorn (Large)     | 110              | 100          | 22            |  
+| 2024-06-01 10:10    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 190              | 180          | 12            |  
+| 2024-06-01 10:10    | Cinema A1 | CND001 | Candy Mix           | 76               | 75           | 3             |  
+| 2024-06-01 10:10    | Cinema A1 | NCH001 | Nachos              | 46               | 50           | 22            |  
+| 2024-06-01 10:10    | Cinema A1 | HOT001 | Hotdog              | 64               | 55           | 22            |  
+| 2024-06-01 10:15    | Cinema A1 | POP001 | Popcorn (Large)     | 105              | 100          | 22            |  
+| 2024-06-01 10:15    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 185              | 180          | 12            |  
+| 2024-06-01 10:15    | Cinema A1 | CND001 | Candy Mix           | 74               | 75           | 3             |  
+| 2024-06-01 10:15    | Cinema A1 | NCH001 | Nachos              | 44               | 50           | 22            |  
+| 2024-06-01 10:15    | Cinema A1 | HOT001 | Hotdog              | 66               | 55           | 22            |  
+| 2024-06-01 10:20    | Cinema A1 | POP001 | Popcorn (Large)     | 95               | 100          | 22            |  
+| 2024-06-01 10:20    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 180              | 180          | 12            |  
+| 2024-06-01 10:20    | Cinema A1 | CND001 | Candy Mix           | 72               | 75           | 3             |  
+| 2024-06-01 10:20    | Cinema A1 | NCH001 | Nachos              | 42               | 50           | 22            |  
+| 2024-06-01 10:20    | Cinema A1 | HOT001 | Hotdog              | 68               | 55           | 22            |  
+| 2024-06-01 10:25    | Cinema A1 | POP001 | Popcorn (Large)     | 90               | 100          | 22            |  
+| 2024-06-01 10:25    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 175              | 180          | 12            |  
+| 2024-06-01 10:25    | Cinema A1 | CND001 | Candy Mix           | 70               | 75           | 3             |  
+| 2024-06-01 10:25    | Cinema A1 | NCH001 | Nachos              | 40               | 50           | 22            |  
+| 2024-06-01 10:25    | Cinema A1 | HOT001 | Hotdog              | 70               | 55           | 22            |  
+| 2024-06-01 10:30    | Cinema A1 | POP001 | Popcorn (Large)     | 85               | 100          | 22            |  
+| 2024-06-01 10:30    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 170              | 180          | 12            |  
+| 2024-06-01 10:30    | Cinema A1 | CND001 | Candy Mix           | 68               | 75           | 3             |  
+| 2024-06-01 10:30    | Cinema A1 | NCH001 | Nachos              | 38               | 50           | 22            |  
+| 2024-06-01 10:30    | Cinema A1 | HOT001 | Hotdog              | 72               | 55           | 22            |  
+| 2024-06-01 10:35    | Cinema A1 | POP001 | Popcorn (Large)     | 80               | 100          | 22            |  
+| 2024-06-01 10:35    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 165              | 180          | 12            |  
+| 2024-06-01 10:35    | Cinema A1 | CND001 | Candy Mix           | 66               | 75           | 3             |  
+| 2024-06-01 10:35    | Cinema A1 | NCH001 | Nachos              | 36               | 50           | 22            |  
+| 2024-06-01 10:35    | Cinema A1 | HOT001 | Hotdog              | 74               | 55           | 22            |  
+| 2024-06-01 10:40    | Cinema A1 | POP001 | Popcorn (Large)     | 75               | 100          | 22            |  
+| 2024-06-01 10:40    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 160              | 180          | 12            |  
+| 2024-06-01 10:40    | Cinema A1 | CND001 | Candy Mix           | 64               | 75           | 3             |  
+| 2024-06-01 10:40    | Cinema A1 | NCH001 | Nachos              | 34               | 50           | 22            |  
+| 2024-06-01 10:40    | Cinema A1 | HOT001 | Hotdog              | 76               | 55           | 22            |  
+| 2024-06-01 10:45    | Cinema A1 | POP001 | Popcorn (Large)     | 70               | 100          | 22            |  
+| 2024-06-01 10:45    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 155              | 180          | 12            |  
+| 2024-06-01 10:45    | Cinema A1 | CND001 | Candy Mix           | 62               | 75           | 3             |  
+| 2024-06-01 10:45    | Cinema A1 | NCH001 | Nachos              | 32               | 50           | 22            |  
+| 2024-06-01 10:45    | Cinema A1 | HOT001 | Hotdog              | 78               | 55           | 22            |  
+| 2024-06-01 10:50    | Cinema A1 | POP001 | Popcorn (Large)     | 65               | 100          | 22            |  
+| 2024-06-01 10:50    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 150              | 180          | 12            |  
+| 2024-06-01 10:50    | Cinema A1 | CND001 | Candy Mix           | 60               | 75           | 3             |  
+| 2024-06-01 10:50    | Cinema A1 | NCH001 | Nachos              | 30               | 50           | 22            |  
+| 2024-06-01 10:50    | Cinema A1 | HOT001 | Hotdog              | 80               | 55           | 22            |  
+| 2024-06-01 10:55    | Cinema A1 | POP001 | Popcorn (Large)     | 60               | 100          | 22            |  
+| 2024-06-01 10:55    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 145              | 180          | 12            |  
+| 2024-06-01 10:55    | Cinema A1 | CND001 | Candy Mix           | 58               | 75           | 3             |  
+| 2024-06-01 10:55    | Cinema A1 | NCH001 | Nachos              | 28               | 50           | 22            |  
+| 2024-06-01 10:55    | Cinema A1 | HOT001 | Hotdog              | 82               | 55           | 22            |  
+| 2024-06-01 11:00    | Cinema A1 | POP001 | Popcorn (Large)     | 55               | 100          | 22            |  
+| 2024-06-01 11:00    | Cinema A1 | DRK001 | Soft Drink (500ml)  | 140              | 180          | 12            |  
+| 2024-06-01 11:00    | Cinema A1 | CND001 | Candy Mix           | 56               | 75           | 3             |  
+| 2024-06-01 11:00    | Cinema A1 | NCH001 | Nachos              | 26               | 50           | 22            |  
+| 2024-06-01 11:00    | Cinema A1 | HOT001 | Hotdog              | 84               | 55           | 2             |  
+
+### Dataset 2: Sales data
+| Timestamp           | Location   | ItemID | ItemName            | UnitsSold | SalesPrice | TransactionCount |  
+|---------------------|------------|--------|---------------------|-----------|------------|-------------------|  
+| 2024-06-01 10:00    | Cinema A1  | POP001 | Popcorn (Large)     | 15        | 8.50       | 520               |  
+| 2024-06-01 10:00    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 25        | 3.00       | 820               |  
+| 2024-06-01 10:00    | Cinema A1  | CND001 | Candy Mix           | 10        | 4.00       | 320               |  
+| 2024-06-01 10:00    | Cinema A1  | NCH001 | Nachos              | 5         | 6.50       | 220               |  
+| 2024-06-01 10:00    | Cinema A1  | HOT001 | Hotdog              | 7         | 5.50       | 320               |  
+| 2024-06-01 10:05    | Cinema A1  | POP001 | Popcorn (Large)     | 13        | 8.50       | 420               |  
+| 2024-06-01 10:05    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 22        | 3.00       | 720               |  
+| 2024-06-01 10:05    | Cinema A1  | CND001 | Candy Mix           | 12        | 4.00       | 420               |  
+| 2024-06-01 10:05    | Cinema A1  | NCH001 | Nachos              | 6         | 6.50       | 220               |  
+| 2024-06-01 10:05    | Cinema A1  | HOT001 | Hotdog              | 8         | 5.50       | 320               |  
+| 2024-06-01 10:10    | Cinema A1  | POP001 | Popcorn (Large)     | 20        | 8.50       | 720               |  
+| 2024-06-01 10:10    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 30        | 3.00       | 1020              |  
+| 2024-06-01 10:10    | Cinema A1  | CND001 | Candy Mix           | 15        | 4.00       | 520               |  
+| 2024-06-01 10:10    | Cinema A1  | NCH001 | Nachos              | 8         | 6.50       | 320               |  
+| 2024-06-01 10:10    | Cinema A1  | HOT001 | Hotdog              | 10        | 5.50       | 420               |  
+| 2024-06-01 10:15    | Cinema A1  | POP001 | Popcorn (Large)     | 18        | 8.50       | 620               |  
+| 2024-06-01 10:15    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 28        | 3.00       | 920               |  
+| 2024-06-01 10:15    | Cinema A1  | CND001 | Candy Mix           | 14        | 4.00       | 420               |  
+| 2024-06-01 10:15    | Cinema A1  | NCH001 | Nachos              | 7         | 6.50       | 320               |  
+| 2024-06-01 10:15    | Cinema A1  | HOT001 | Hotdog              | 9         | 5.50       | 320               |  
+| 2024-06-01 10:20    | Cinema A1  | POP001 | Popcorn (Large)     | 12        | 8.50       | 520               |  
+| 2024-06-01 10:20    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 26        | 3.00       | 820               |  
+| 2024-06-01 10:20    | Cinema A1  | CND001 | Candy Mix           | 10        | 4.00       | 320               |  
+| 2024-06-01 10:20    | Cinema A1  | NCH001 | Nachos              | 4         | 6.50       | 220               |  
+| 2024-06-01 10:20    | Cinema A1  | HOT001 | Hotdog              | 6         | 5.50       | 320               |  
+| 2024-06-01 10:25    | Cinema A1  | POP001 | Popcorn (Large)     | 10        | 8.50       | 420               |  
+| 2024-06-01 10:25    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 24        | 3.00       | 720               |  
+| 2024-06-01 10:25    | Cinema A1  | CND001 | Candy Mix           | 8         | 4.00       | 320               |  
+| 2024-06-01 10:25    | Cinema A1  | NCH001 | Nachos              | 3         | 6.50       | 220               |  
+| 2024-06-01 10:25    | Cinema A1  | HOT001 | Hotdog              | 5         | 5.50       | 220               |  
+| 2024-06-01 10:30    | Cinema A1  | POP001 | Popcorn (Large)     | 8         | 8.50       | 320               |  
+| 2024-06-01 10:30    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 22        | 3.00       | 720               |  
+| 2024-06-01 10:30    | Cinema A1  | CND001 | Candy Mix           | 7         | 4.00       | 320               |  
+| 2024-06-01 10:30    | Cinema A1  | NCH001 | Nachos              | 4         | 6.50       | 220               |  
+| 2024-06-01 10:30    | Cinema A1  | HOT001 | Hotdog              | 6         | 5.50       | 320               |  
+| 2024-06-01 10:35    | Cinema A1  | POP001 | Popcorn (Large)     | 6         | 8.50       | 320               |  
+| 2024-06-01 10:35    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 20        | 3.00       | 620               |  
+| 2024-06-01 10:35    | Cinema A1  | CND001 | Candy Mix           | 6         | 4.00       | 220               |  
+| 2024-06-01 10:35    | Cinema A1  | NCH001 | Nachos              | 3         | 6.50       | 220               |  
+| 2024-06-01 10:35    | Cinema A1  | HOT001 | Hotdog              | 5         | 5.50       | 220               |  
+| 2024-06-01 10:40    | Cinema A1  | POP001 | Popcorn (Large)     | 5         | 8.50       | 220               |  
+| 2024-06-01 10:40    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 18        | 3.00       | 620               |  
+| 2024-06-01 10:40    | Cinema A1  | CND001 | Candy Mix           | 5         | 4.00       | 220               |  
+| 2024-06-01 10:40    | Cinema A1  | NCH001 | Nachos              | 3         | 6.50       | 220               |  
+| 2024-06-01 10:40    | Cinema A1  | HOT001 | Hotdog              | 4         | 5.50       | 220               |  
+| 2024-06-01 10:45    | Cinema A1  | POP001 | Popcorn (Large)     | 4         | 8.50       | 220               |  
+| 2024-06-01 10:45    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 16        | 3.00       | 520               |  
+| 2024-06-01 10:45    | Cinema A1  | CND001 | Candy Mix           | 4         | 4.00       | 220               |  
+| 2024-06-01 10:45    | Cinema A1  | NCH001 | Nachos              | 2         | 6.50       | 120               |  
+| 2024-06-01 10:45    | Cinema A1  | HOT001 | Hotdog              | 3         | 5.50       | 120               |  
+| 2024-06-01 10:50    | Cinema A1  | POP001 | Popcorn (Large)     | 3         | 8.50       | 120               |  
+| 2024-06-01 10:50    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 15        | 3.00       | 520               |  
+| 2024-06-01 10:50    | Cinema A1  | CND001 | Candy Mix           | 3         | 4.00       | 120               |  
+| 2024-06-01 10:50    | Cinema A1  | NCH001 | Nachos              | 2         | 6.50       | 120               |  
+| 2024-06-01 10:50    | Cinema A1  | HOT001 | Hotdog              | 3         | 5.50       | 120               |  
+| 2024-06-01 10:55    | Cinema A1  | POP001 | Popcorn (Large)     | 2         | 8.50       | 120               |  
+| 2024-06-01 10:55    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 14        | 3.00       | 520               |  
+| 2024-06-01 10:55    | Cinema A1  | CND001 | Candy Mix           | 2         | 4.00       | 120               |  
+| 2024-06-01 10:55    | Cinema A1  | NCH001 | Nachos              | 1         | 6.50       | 120               |  
+| 2024-06-01 10:55    | Cinema A1  | HOT001 | Hotdog              | 2         | 5.50       | 120               |  
+| 2024-06-01 11:00    | Cinema A1  | POP001 | Popcorn (Large)     | 2         | 8.50       | 120               |  
+| 2024-06-01 11:00    | Cinema A1  | DRK001 | Soft Drink (500ml)  | 13        | 3.00       | 420               |  
+| 2024-06-01 11:00    | Cinema A1  | CND001 | Candy Mix           | 2         | 4.00       | 120               |  
+| 2024-06-01 11:00    | Cinema A1  | NCH001 | Nachos              | 1         | 6.50       | 120               |  
+| 2024-06-01 11:00    | Cinema A1  | HOT001 | Hotdog              | 2         | 5.50       | 120               |  
+
+
+Reply "TERMINATE" in the end when everything is done.
+`,
+      description:"An agent integrate the flagged transaction trends with customer profile data from data analysis done by Transaction Trend Analyzer agent. ",
+      icon:"🎻",
+      index_name:""
+      },
+];
+
 
 //   const sampleMarkdown = `
 // # Sample Markdown Document
