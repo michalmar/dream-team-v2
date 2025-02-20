@@ -1,0 +1,29 @@
+openai
+python-dotenv>=1.0.1
+azure-identity>=1.19.0
+# PyMuPDF
+# azure-cognitiveservices-speech
+fastapi
+azure-storage-blob
+# sqlalchemy
+uvicorn
+fastapi
+fastapi-cors
+python-multipart
+tiktoken
+jinja2
+
+autogen-agentchat==0.4.6
+autogen-ext[azure]==0.4.6
+autogen-ext[docker]==0.4.6
+autogen-core==0.4.6
+# streamlit>=1.41.1
+# promptflow-tracing==1.17.1
+#promptflow-devkit==1.17.1
+azure-search-documents==11.6.0b4
+markitdown>=0.0.1a3
+aiofiles>=24.1.0
+aiohttp>=3.11.11
+playwright>=1.49.1
+
+azure-cosmos

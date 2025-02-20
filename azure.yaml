@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: dreamteam
+metadata:
+    template: azd-init@1.10.3
+services:
+    backend:
+        project: backend
+        host: containerapp
+        language: python
+        docker:
+            path: Dockerfile
+    frontend:
+        project: frontend
+        host: staticwebapp
+        language: ts
