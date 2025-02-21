@@ -5,6 +5,7 @@ from autogen_core.models import (
 from azure.search.documents import SearchClient
 from azure.core.credentials import AzureKeyCredential
 from azure.search.documents.models import VectorizableTextQuery
+from azure.identity import DefaultAzureCredential
 
 '''
 Please provide the following environment variables in your .env file:
@@ -30,7 +31,7 @@ class MagenticOneRAGAgent(AssistantAgent):
         model_client: ChatCompletionClient,
         index_name: str,
         AZURE_SEARCH_SERVICE_ENDPOINT: str,
-        AZURE_SEARCH_ADMIN_KEY: str,
+        # AZURE_SEARCH_ADMIN_KEY: str = None,
         description: str = MAGENTIC_ONE_RAG_DESCRIPTION,
 
     ):
@@ -45,14 +46,15 @@ class MagenticOneRAGAgent(AssistantAgent):
 
         self.index_name = index_name    
         self.AZURE_SEARCH_SERVICE_ENDPOINT = AZURE_SEARCH_SERVICE_ENDPOINT
-        self.AZURE_SEARCH_ADMIN_KEY = AZURE_SEARCH_ADMIN_KEY
+        # self.AZURE_SEARCH_ADMIN_KEY = AZURE_SEARCH_ADMIN_KEY
 
         
     def config_search(self) -> SearchClient:
         service_endpoint = self.AZURE_SEARCH_SERVICE_ENDPOINT
-        key = self.AZURE_SEARCH_ADMIN_KEY
+        # key = self.AZURE_SEARCH_ADMIN_KEY
         index_name = self.index_name
-        credential = AzureKeyCredential(key)
+        # credential = AzureKeyCredential(key)
+        credential = DefaultAzureCredential()
         return SearchClient(endpoint=service_endpoint, index_name=index_name, credential=credential)
 
     async def do_search(self, query: str) -> str:

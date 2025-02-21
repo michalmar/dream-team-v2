@@ -182,7 +182,7 @@ class MagenticOneHelper:
                     index_name=agent["index_name"],
                     description=agent["description"],
                     AZURE_SEARCH_SERVICE_ENDPOINT=os.getenv("AZURE_SEARCH_SERVICE_ENDPOINT"),
-                    AZURE_SEARCH_ADMIN_KEY=os.getenv("AZURE_SEARCH_ADMIN_KEY")
+                    # AZURE_SEARCH_ADMIN_KEY=os.getenv("AZURE_SEARCH_ADMIN_KEY")
                     )
                 agent_list.append(rag_agent)
                 print(f'{agent["name"]} (RAG) added!')

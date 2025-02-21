@@ -124,6 +124,7 @@ module backend './app/backend.bicep' = {
     userPrincipalId: principalId
     customSubDomainName: '${prefix}-${resourceToken}'
     cosmosdbName: '${abbrs.documentDBDatabaseAccounts}${resourceToken}'
+    aiSearchName: '${abbrs.searchSearchServices}${resourceToken}'
   }
   scope: rg
 }
@@ -152,5 +153,7 @@ output STATIC_SITE_ENDPOINT string = frontend.outputs.staticSiteEndpoint
 output COSMOS_DB_URI string = backend.outputs.cosmosdb_uri
 output COSMOS_DB_DATABASE string = backend.outputs.cosmosdb_database
 output CONTAINER_NAME string = backend.outputs.container_name
+output AZURE_SEARCH_SERVICE_ENDPOINT string = backend.outputs.ai_search_endpoint
+// output AZURE_SEARCH_ADMIN_KEY string = backend.outputs.ai_search_admin_key
 
 

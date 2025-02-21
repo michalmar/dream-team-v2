@@ -11,12 +11,16 @@ param exists bool
 param azureOpenaiResourceName string = 'dreamv2' 
 param azureOpenaiDeploymentName string = 'gpt-4o'
 param azureOpenaiDeploymentNameMini string = 'gpt-4o-mini'
+param azureOpenaiDeploymentNameEmbedding string = 'text-embedding-3-large'
 
 @description('Custom subdomain name for the OpenAI resource (must be unique in the region)')
 param customSubDomainName string
 
 @description('Name of the Cosmos DB account')
 param cosmosdbName string
+
+@description('Name of the Azure Search resource')
+param aiSearchName string
 
 @secure()
 param appDefinition object
@@ -182,6 +186,14 @@ resource app 'Microsoft.App/containerApps@2023-05-02-preview' = {
               name: 'CONTAINER_NAME'
               value: 'ag_demo'
             }
+            {
+              name: 'AZURE_SEARCH_SERVICE_ENDPOINT'
+              value: 'https://${aiSearch.name}.search.windows.net'
+            }
+            // {
+            //   name: 'AZURE_SEARCH_ADMIN_KEY'
+            //   value: aiSearch.listAdminKeys().primaryKey
+            // }
       
           ],
           env,
@@ -253,6 +265,24 @@ resource openaideploymentmini 'Microsoft.CognitiveServices/accounts/deployments@
   dependsOn: [openaideployment]
 }
 
+resource openaideploymentembedding 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = {
+  name: azureOpenaiDeploymentNameEmbedding
+  parent: openai
+  sku: {
+    name: 'Standard'
+    capacity: 99
+  }
+  properties: {
+    model: {
+      name: 'text-embedding-3-large'
+      format: 'OpenAI'
+      version: '1'
+      
+    }
+    versionUpgradeOption: 'OnceCurrentVersionExpired'
+  }
+}
+
 resource dynamicsession 'Microsoft.App/sessionPools@2024-02-02-preview' = {
   name: 'sessionPool'
   location: location
@@ -314,14 +344,6 @@ resource appOpenaiRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-0
   }
 }
 
-// resource cosmosDbRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-//   name: guid(cosmosDb.id, identity.id, 'CosmosDBCustomRole')
-//   scope: cosmosDb
-//   properties: {
-//     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '00000000-0000-0000-0000-000000000002')
-//     principalId: identity.properties.principalId
-//   }
-// }
 @description('Name of the role definition.')
 param roleDefinitionName string = 'Azure Cosmos DB for NoSQL Data Plane Owner'
 
@@ -355,6 +377,47 @@ resource assignment 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments@20
   }
 }
 
+// Add AI Search resource creation
+resource aiSearch 'Microsoft.Search/searchServices@2024-06-01-preview' = {
+  name: aiSearchName
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: { '${identity.id}': {} }
+  }
+  location: location
+  sku: {
+    name: 'basic'
+  }
+  properties: {
+    hostingMode: 'default'
+    replicaCount: 1
+    partitionCount: 1
+    authOptions: {
+        aadOrApiKey: {aadAuthFailureMode: 'http403'} 
+      
+    }
+  }
+}
+
+resource aiSearchContributorRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(aiSearch.id, identity.id, 'SearchServiceContributor')
+  scope: aiSearch
+  properties: {
+    principalId: identity.properties.principalId
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7ca78c08-252a-4471-8644-bb5ff32d4ba0')
+  }
+}
+resource aiSearchDataContributorRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(aiSearch.id, identity.id, 'SearchServiceDataContributor')
+  scope: aiSearch
+  properties: {
+    principalId: identity.properties.principalId
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '8ebe5a00-799e-43f5-93ac-243d3dce84a7')
+  }
+}
+
 output defaultDomain string = containerAppsEnvironment.properties.defaultDomain
 output name string = app.name
 output uri string = 'https://${app.properties.configuration.ingress.fqdn}'
@@ -364,3 +427,7 @@ output pool_endpoint string = dynamicsession.properties.poolManagementEndpoint
 output cosmosdb_uri string = cosmosDb.properties.documentEndpoint
 output cosmosdb_database string = 'ag_demo'
 output container_name string = 'ag_demo'
+
+// Add output for AI Search endpoint
+output ai_search_endpoint string = 'https://${aiSearch.name}.search.windows.net'
+// output ai_search_admin_key string = aiSearch.listAdminKeys().primaryKey
