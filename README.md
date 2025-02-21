@@ -19,7 +19,7 @@ This repository leverages Microsoft Autogen 0.4, Azure OpenAI and integrates it 
 Dream Team offers the following key features:
 
 - **Advanced multi agent framework**: this solution is based on the popular framework Autogen(35K stars) and Magentic One
-- **Friendly UI**: easy way to build and share data apps powered by Streamlit
+- **Friendly UI**: easy way to build and share data apps powered by React / Vite.js / Tailwind / Shadcn
 - **Single line deployment**: developer-friendly deployment that accelerates your path from a local development environment to Azure with single line of code - azd up.
 - **Secure code execution**:  Fast access to secure sandboxed with strong isolation environments that are ideal for running code or applications with Azure Container Apps dynamic sessions.
 - **Managed Identities**: Built in Azure Managed identities to eliminate the need for developers to manage these credentials
