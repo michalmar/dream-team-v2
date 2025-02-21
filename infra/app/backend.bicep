@@ -16,6 +16,9 @@ param dailyRateLimit int = 100000 // Set your daily rate limit here
 @description('Custom subdomain name for the OpenAI resource (must be unique in the region)')
 param customSubDomainName string
 
+@description('Name of the Cosmos DB account')
+param cosmosdbName string
+
 @secure()
 param appDefinition object
 
@@ -70,7 +73,7 @@ module fetchLatestImage '../modules/fetch-container-image.bicep' = {
 }
 
 resource cosmosDb 'Microsoft.DocumentDB/databaseAccounts@2021-04-15' = {
-  name: '${name}-cosmosdb-hist'
+  name: cosmosdbName
   location: 'northeurope' //location
   kind: 'GlobalDocumentDB'
   properties: {
@@ -180,6 +183,7 @@ resource app 'Microsoft.App/containerApps@2023-05-02-preview' = {
               name: 'CONTAINER_NAME'
               value: 'ag_demo'
             }
+      
           ],
           env,
           map(secrets, secret => {

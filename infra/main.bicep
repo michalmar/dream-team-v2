@@ -123,6 +123,7 @@ module backend './app/backend.bicep' = {
     appDefinition: srcDefinition
     userPrincipalId: principalId
     customSubDomainName: '${prefix}-${resourceToken}'
+    cosmosdbName: '${abbrs.documentDBDatabaseAccounts}${resourceToken}'
   }
   scope: rg
 }
