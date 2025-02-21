@@ -153,7 +153,7 @@ export default function Agents() {
   const addAgent = (name: string, description: string, systemMessage: string) => {
     const newAgent = {
       input_key: (agents.length + 1).toString().padStart(4, '0'),
-      type: "MagenticOne",
+      type: "Custom",
       name,
       system_message: systemMessage,
       description,
@@ -162,6 +162,16 @@ export default function Agents() {
     };
     setAgents([...agents, newAgent]);
   };
+
+  const editAgent = (key: string, name: string, description: string, systemMessage: string) => {
+    const updatedAgents = agents.map((agent) =>
+      agent.input_key === key
+        ? { ...agent, name, description, system_message: systemMessage }
+        : agent
+    );
+    setAgents(updatedAgents);
+  };
+
 
   const addRAGAgent = (name: string, description: string, indexName: string) => {
     const newAgent = {
@@ -291,6 +301,7 @@ export default function Agents() {
                   removeAgent={removeAgent}
                   addAgent={addAgent}
                   addRAGAgent={addRAGAgent}
+                  editAgent={editAgent}
                   getAvatarSrc={getAvatarSrc}
                   isCollapsed={false}
                   />
