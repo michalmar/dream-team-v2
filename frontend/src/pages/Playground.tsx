@@ -47,6 +47,9 @@ const ALLWAYS_LOGGED_IN =
   import.meta.env.VITE_ALLWAYS_LOGGED_IN === "true" ? true : false;
 const ACTIVATION_CODE = import.meta.env.VITE_ACTIVATON_CODE;
 
+console.log('BASE_URL:', BASE_URL);
+console.log('ALLWAYS_LOGGED_IN:', ALLWAYS_LOGGED_IN);
+// console.log('ACTIVATION_CODE:', ACTIVATION_CODE);
 
 interface ChatMessage {
   user: string;

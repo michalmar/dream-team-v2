@@ -3,7 +3,8 @@ name: Frontend - SWA CI/CD
 on:
   push:
     paths:
-      - 'frontend/**'
+      # - 'frontend/**'
+      - 'DONOTOUCHANGE/**'
   # pull_request:
   #   # types: [opened, synchronize, reopened, closed]
   #   branches:
