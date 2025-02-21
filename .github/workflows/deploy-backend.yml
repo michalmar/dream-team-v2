@@ -1,0 +1,114 @@
+name: Container App Build&Release to ACR
+
+permissions:
+    id-token: write # This is required for requesting the JWT
+    contents: read
+on:
+  push:
+    # branches:
+    #   - main
+    paths:
+      # - 'backend/**'
+      - 'DONOTOUCHANGE/**'
+
+  # push:
+  #   # Sequence of patterns matched against refs/tags
+  #   tags:
+  #     - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to deploy'
+        required: true
+        default: 'v1.0.0'
+
+env:
+  AZURE_WI_SUBS_ID: de281c5e-5d60-4fc1-b905-c91caf45e624
+  ACR_NAME: crhbulcqopho3ri
+  SVC_NAME: backend
+  ACR_SERVER: crhbulcqopho3ri.azurecr.io
+  VERSION: 0.0.15
+  RESOURCE_GROUP: rg-dream-team6
+  CONTAINER_APP_ENV: cae-hbulcqopho3ri
+  AZURE_OPENAI_ENDPOINT: https://dreamv2-hbulcqopho3ri.openai.azure.com/
+  POOL_MANAGEMENT_ENDPOINT: https://eastus.dynamicsessions.io/subscriptions/de281c5e-5d60-4fc1-b905-c91caf45e624/resourceGroups/rg-dream-team6/sessionPools/sessionpool
+  AZURE_SEARCH_SERVICE_ENDPOINT: https://search-demo-mma.search.windows.net
+  COSMOS_DB_URI: https://cosmos-hbulcqopho3ri.documents.azure.com:443/
+  COSMOS_DB_DATABASE: ag_demo
+  COSMOS_DB_CONTAINER: ag_demo
+#   AZURE_SEARCH_SERVICE_KEY: secretref:AZURE_SEARCH_KEY
+#   AZURE_OPENAI_EMBEDDING_ENDPOINT: https://circuitloom-openai.openai.azure.com/
+#   AZURE_OPENAI_EMBEDDING_MODEL_NAME: text-embedding-3-large
+#   AZURE_SEARCH_ENDPOINT: https://intdemosearch.search.windows.net
+#   AZURE_SEARCH_INDEX: "demo-index-hack"
+#   AZURE_SEARCH_API_VERSION: "2023-07-01-Preview"
+#   AZURE_FORMREC_SERVICE: intdemodi
+#   FORM_RECOGNIZER_ENDPOINT: https://intdemodi.cognitiveservices.azure.com/
+#   DOCINT_API_VERSION: 2024-07-31-preview
+#   NUM_TOKENS: 2048
+#   MIN_CHUNK_SIZE: 100
+#   TOKEN_OVERLAP: 100
+#   AZURE_CLIENT_ID: 0a945281-1724-4519-b4ab-7d4ed71372fc
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    # environment: DEV
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # - name: Get Version
+      #   id: set_version
+      #   run: |
+      #     VER=${{github.ref_name}}
+      #     echo $VER
+      #     echo "::set-output name=version_tag::${VER:1}"
+
+      - name: OIDC Login to Azure
+        uses: azure/login@v2
+        with:
+            client-id: ${{ secrets.AUTOGENDEMOBE2_AZURE_CLIENT_ID }}
+            tenant-id: ${{ secrets.AUTOGENDEMOBE2_AZURE_TENANT_ID }}
+            subscription-id: ${{ secrets.AUTOGENDEMOBE2_AZURE_SUBSCRIPTION_ID }}
+      
+      - name: Build the Docker image
+        if: success()
+        run: |
+          docker build . --file Dockerfile --tag ${{ env.ACR_SERVER }}/${{ env.SVC_NAME }}:${{env.VERSION}}
+           
+        
+      - name: Push the Docker image
+        if: success()
+        run: |    
+          az acr login --name ${{ env.ACR_NAME }}
+          docker push ${{ env.ACR_SERVER }}/${{ env.SVC_NAME }}:${{env.VERSION}}
+
+      # - name: Build and deploy Container App
+      #   uses: azure/container-apps-deploy-action@v2
+      #   with:
+      #     acrName: ${{ env.ACR_NAME }}
+      #     resourceGroup: ${{ env.RESOURCE_GROUP }}
+      #     containerAppName: ${{ env.SVC_NAME }}
+      #     containerAppEnvironment: ${{ env.CONTAINER_APP_ENV }}
+      #     imageToDeploy: ${{ env.ACR_SERVER }}/${{ env.SVC_NAME }}:${{ env.VERSION }}
+      #     # environmentVariables: [${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}]
+      #     environmentVariables: |
+      #       "AZURE_OPENAI_SERVICE_NAME=${{ env.AZURE_OPENAI_SERVICE_NAME }}" "AZURE_OPENAI_ENDPOINT=${{ env.AZURE_OPENAI_ENDPOINT }}" "AZURE_OPENAI_API_KEY=secretref:aoai-key" "AZURE_OPENAI_MODEL_NAME=${{ env.AZURE_OPENAI_MODEL_NAME }}" "AZURE_OPENAI_API_VERSION=${{ env.AZURE_OPENAI_API_VERSION }}" "AZURE_OPENAI_EMBEDDING_ENDPOINT=${{ env.AZURE_OPENAI_EMBEDDING_ENDPOINT }}" "AZURE_OPENAI_EMBEDDING_MODEL_NAME=${{ env.AZURE_OPENAI_EMBEDDING_MODEL_NAME }}" "AZURE_SEARCH_ENDPOINT=${{ env.AZURE_SEARCH_ENDPOINT }}" "AZURE_SEARCH_KEY=secretref:search-key" "AZURE_SEARCH_INDEX=${{ env.AZURE_SEARCH_INDEX }}" "AZURE_SEARCH_API_VERSION=${{ env.AZURE_SEARCH_API_VERSION }}" "AZURE_FORMREC_SERVICE=${{ env.AZURE_FORMREC_SERVICE }}" "FORM_RECOGNIZER_ENDPOINT=${{ env.FORM_RECOGNIZER_ENDPOINT }}"  "DOCINT_API_VERSION=${{ env.DOCINT_API_VERSION }}" "NUM_TOKENS=${{ env.NUM_TOKENS }}" "MIN_CHUNK_SIZE=${{ env.MIN_CHUNK_SIZE }}" "TOKEN_OVERLAP=${{ env.TOKEN_OVERLAP }}" "AZURE_CLIENT_ID=${{ env.AZURE_CLIENT_ID }}"
+      
+      - name: Deploy to Azure Container App
+        run: |
+            az account set --subscription ${{ env.AZURE_WI_SUBS_ID }}
+            az extension add --name containerapp --upgrade --allow-preview true
+            az containerapp up \
+                --name ${{ env.SVC_NAME }} \
+                --resource-group ${{ env.RESOURCE_GROUP }} \
+                --environment ${{ env.CONTAINER_APP_ENV }} \
+                --registry-server ${{ env.ACR_SERVER }} \
+                --registry-username ${{ env.ACR_NAME }} \
+                --registry-password ${{ secrets.ACR_SECRET }} \
+                --image ${{ env.ACR_SERVER }}/${{ env.SVC_NAME }}:${{ env.VERSION }} \
+                --target-port 3100 \
+                --ingress 'external' \
+                --env-vars "AZURE_OPENAI_ENDPOINT=${{ env.AZURE_OPENAI_ENDPOINT }}" "POOL_MANAGEMENT_ENDPOINT=${{ env.POOL_MANAGEMENT_ENDPOINT }}"  "AZURE_SEARCH_SERVICE_ENDPOINT=${{ env.AZURE_SEARCH_SERVICE_ENDPOINT }}" "AZURE_SEARCH_ADMIN_KEY=${{ secrets.AZURE_SEARCH_KEY }}" "COSMOS_DB_URI=${{ env.COSMOS_DB_URI }}" "COSMOS_DB_DATABASE=${{ env.COSMOS_DB_DATABASE }}" "COSMOS_DB_CONTAINER=${{ env.COSMOS_DB_CONTAINER }}"

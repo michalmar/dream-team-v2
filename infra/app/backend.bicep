@@ -11,7 +11,6 @@ param exists bool
 param azureOpenaiResourceName string = 'dreamv2' 
 param azureOpenaiDeploymentName string = 'gpt-4o'
 param azureOpenaiDeploymentNameMini string = 'gpt-4o-mini'
-param dailyRateLimit int = 100000 // Set your daily rate limit here
 
 @description('Custom subdomain name for the OpenAI resource (must be unique in the region)')
 param customSubDomainName string
@@ -213,8 +212,6 @@ resource openai 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
   kind: 'OpenAI'
   properties: {
     customSubDomainName: customSubDomainName
-    dailyRateLimit: dailyRateLimit
-    
   }
 }
 
