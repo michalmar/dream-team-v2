@@ -279,7 +279,7 @@ export const agentsTeam2: Agent[] = [
   
   Reply "TERMINATE" in the end when everything is done.
   `,
-        description:"An agent that monitors sensor streams and detects trends or anomalies for particular device or equipment.",
+        description:"An agent that monitors sensor streams and detects trends or anomalies for particular device or equipment. Has access to all data needed.",
         icon:"🎻",
         index_name:""
         },
