@@ -119,6 +119,12 @@ cd frontend
 ```bash
 npm install
 ```
+
+> Note: In case you don't have necessary dependencies, you can run: 
+```bash
+npm install -D @types/react @types/react-dom @types/node typescript @vitejs/plugin-react vite
+```
+
 ### Update configuration
 
 Change `env.local`

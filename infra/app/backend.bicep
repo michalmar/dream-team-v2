@@ -281,6 +281,7 @@ resource openaideploymentembedding 'Microsoft.CognitiveServices/accounts/deploym
     }
     versionUpgradeOption: 'OnceCurrentVersionExpired'
   }
+  dependsOn: [openaideploymentmini]
 }
 
 resource dynamicsession 'Microsoft.App/sessionPools@2024-02-02-preview' = {
