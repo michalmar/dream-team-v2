@@ -118,6 +118,89 @@ resource cosmosDbContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/c
   }
 }
 
+// Add Virtual Network with two subnets: default and aca
+resource vnet 'Microsoft.Network/virtualNetworks@2021-05-01' = {
+  name: 'vnet-${name}'
+  location: location
+  properties: {
+    addressSpace: {
+      addressPrefixes: [
+        '10.0.0.0/16'
+      ]
+    }
+    subnets: [
+      {
+        name: 'default'
+        properties: {
+          addressPrefix: '10.0.1.0/24'
+        }
+      }
+      {
+        name: 'aca'
+        properties: {
+          addressPrefix: '10.0.2.0/24'
+        }
+      }
+    ]
+  }
+}
+
+// Create Storage Account with private endpoint in the default subnet
+resource storageAcct 'Microsoft.Storage/storageAccounts@2021-09-01' = {
+  name: toLower('st${uniqueString(name, location)}')
+  location: location
+  sku: {
+    name: 'Standard_LRS'
+  }
+  kind: 'StorageV2'
+  properties: {
+    accessTier: 'Hot'
+  }
+}
+
+resource peStorage 'Microsoft.Network/privateEndpoints@2021-05-01' = {
+  name: 'pe-storage-${uniqueString(name, location)}'
+  location: location
+  properties: {
+    subnet: {
+      id: '${vnet.id}/subnets/default'
+    }
+    privateLinkServiceConnections: [
+      {
+        name: 'storageLink'
+        properties: {
+          privateLinkServiceId: storageAcct.id
+          groupIds: [
+            'blob'
+          ]
+        }
+      }
+    ]
+  }
+}
+
+// Create Private Endpoint for CosmosDB in the default subnet
+resource peCosmos 'Microsoft.Network/privateEndpoints@2021-05-01' = {
+  name: 'pe-cosmos-${uniqueString(name, location)}'
+  location: location
+  properties: {
+    subnet: {
+      id: '${vnet.id}/subnets/default'
+    }
+    privateLinkServiceConnections: [
+      {
+        name: 'cosmosLink'
+        properties: {
+          privateLinkServiceId: cosmosDb.id
+          groupIds: [
+            'Sql'
+          ]
+        }
+      }
+    ]
+  }
+}
+
 resource app 'Microsoft.App/containerApps@2023-05-02-preview' = {
   name: name
   location: location
@@ -134,6 +217,9 @@ resource app 'Microsoft.App/containerApps@2023-05-02-preview' = {
         external: true
         targetPort: 3100
         transport: 'auto'
+      }
+      vnetConfiguration: {
+        infrastructureSubnetId: '${vnet.id}/subnets/aca'
       }
       registries: [
         {
@@ -427,6 +513,7 @@ output pool_endpoint string = dynamicsession.properties.poolManagementEndpoint
 output cosmosdb_uri string = cosmosDb.properties.documentEndpoint
 output cosmosdb_database string = 'ag_demo'
 output container_name string = 'ag_demo'
+output cosmosDbId string = cosmosDb.id
 
 // Add output for AI Search endpoint
 output ai_search_endpoint string = 'https://${aiSearch.name}.search.windows.net'
