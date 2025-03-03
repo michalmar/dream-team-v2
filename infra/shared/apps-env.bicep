@@ -5,6 +5,9 @@ param tags object = {}
 param logAnalyticsWorkspaceName string
 param applicationInsightsName string = ''
 
+// Add infrastructure subnet ID parameter
+param infrastructureSubnetId string = ''
+
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-10-01' = {
   name: name
   location: location
@@ -18,6 +21,10 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2022-10-01'
       }
     }
     daprAIConnectionString: applicationInsights.properties.ConnectionString
+    // Add VNet integration if infrastructureSubnetId is provided
+    vnetConfiguration: !empty(infrastructureSubnetId) ? {
+      infrastructureSubnetId: infrastructureSubnetId
+    } : null
   }
 }
 

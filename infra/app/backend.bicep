@@ -28,6 +28,10 @@ param appDefinition object
 @description('Principal ID of the user executing the deployment')
 param userPrincipalId string
 
+// Add parameter to receive the ACA subnet ID from main.bicep
+param acaSubnetId string
+param defaultSubnetId string
+
 var appSettingsArray = filter(array(appDefinition.settings), i => i.name != '')
 var secrets = map(filter(appSettingsArray, i => i.?secret != null), i => {
   name: i.name
@@ -118,33 +122,6 @@ resource cosmosDbContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/c
   }
 }
 
-// Add Virtual Network with two subnets: default and aca
-resource vnet 'Microsoft.Network/virtualNetworks@2021-05-01' = {
-  name: 'vnet-${name}'
-  location: location
-  properties: {
-    addressSpace: {
-      addressPrefixes: [
-        '10.0.0.0/16'
-      ]
-    }
-    subnets: [
-      {
-        name: 'default'
-        properties: {
-          addressPrefix: '10.0.1.0/24'
-        }
-      }
-      {
-        name: 'aca'
-        properties: {
-          addressPrefix: '10.0.2.0/24'
-        }
-      }
-    ]
-  }
-}
-
 // Create Storage Account with private endpoint in the default subnet
 resource storageAcct 'Microsoft.Storage/storageAccounts@2021-09-01' = {
   name: toLower('st${uniqueString(name, location)}')
@@ -163,7 +140,7 @@ resource peStorage 'Microsoft.Network/privateEndpoints@2021-05-01' = {
   location: location
   properties: {
     subnet: {
-      id: '${vnet.id}/subnets/default'
+      id: defaultSubnetId // Use the defaultSubnetId parameter instead of network module output
     }
     privateLinkServiceConnections: [
       {
@@ -185,7 +162,7 @@ resource peCosmos 'Microsoft.Network/privateEndpoints@2021-05-01' = {
   location: location
   properties: {
     subnet: {
-      id: '${vnet.id}/subnets/default'
+      id: defaultSubnetId // Use the defaultSubnetId parameter instead of network module output
     }
     privateLinkServiceConnections: [
       {
@@ -219,7 +196,7 @@ resource app 'Microsoft.App/containerApps@2023-05-02-preview' = {
         transport: 'auto'
       }
       vnetConfiguration: {
-        infrastructureSubnetId: '${vnet.id}/subnets/aca'
+        infrastructureSubnetId: acaSubnetId // Use the acaSubnetId parameter instead of network module output
       }
       registries: [
         {

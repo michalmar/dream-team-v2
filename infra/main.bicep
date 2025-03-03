@@ -97,6 +97,17 @@ module keyVault './shared/keyvault.bicep' = {
   scope: rg
 }
 
+// Add network module before appsEnv
+module network './shared/netwk.bicep' = {
+  name: 'network'
+  params: {
+    name: environmentName
+    location: location
+    tags: tags
+  }
+  scope: rg
+}
+
 module appsEnv './shared/apps-env.bicep' = {
   name: 'apps-env'
   params: {
@@ -105,6 +116,8 @@ module appsEnv './shared/apps-env.bicep' = {
     tags: tags
     applicationInsightsName: monitoring.outputs.applicationInsightsName
     logAnalyticsWorkspaceName: monitoring.outputs.logAnalyticsWorkspaceName
+    // Pass the ACA subnet ID from the network module
+    infrastructureSubnetId: network.outputs.acaSubnetId
   }
   scope: rg
 }
@@ -125,8 +138,15 @@ module backend './app/backend.bicep' = {
     customSubDomainName: '${prefix}-${resourceToken}'
     cosmosdbName: '${abbrs.documentDBDatabaseAccounts}${resourceToken}'
     aiSearchName: '${abbrs.searchSearchServices}${resourceToken}'
+    // Pass subnet IDs from the network module to backend
+    acaSubnetId: network.outputs.acaSubnetId
+    defaultSubnetId: network.outputs.defaultSubnetId
   }
   scope: rg
+  dependsOn: [
+    network
+    appsEnv
+  ]
 }
 
 // Add frontend deployment module
