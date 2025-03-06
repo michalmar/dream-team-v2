@@ -101,7 +101,7 @@ module keyVault './shared/keyvault.bicep' = {
 module network './shared/netwk.bicep' = {
   name: 'network'
   params: {
-    name: environmentName
+    name: '${abbrs.networkVirtualNetworks}${resourceToken}'
     location: location
     tags: tags
   }
@@ -118,6 +118,7 @@ module appsEnv './shared/apps-env.bicep' = {
     logAnalyticsWorkspaceName: monitoring.outputs.logAnalyticsWorkspaceName
     // Pass the ACA subnet ID from the network module
     infrastructureSubnetId: network.outputs.acaSubnetId
+    // managedResourceGroupName: '${rg.name}-apps-env-mng'
   }
   scope: rg
 }
@@ -141,6 +142,8 @@ module backend './app/backend.bicep' = {
     // Pass subnet IDs from the network module to backend
     acaSubnetId: network.outputs.acaSubnetId
     defaultSubnetId: network.outputs.defaultSubnetId
+    azureOpenaiResourceName: '${abbrs.cognitiveServicesAccounts}${resourceToken}'
+    storageName: '${abbrs.storageStorageAccounts}${resourceToken}'
   }
   scope: rg
   dependsOn: [
@@ -174,6 +177,7 @@ output COSMOS_DB_URI string = backend.outputs.cosmosdb_uri
 output COSMOS_DB_DATABASE string = backend.outputs.cosmosdb_database
 output CONTAINER_NAME string = backend.outputs.container_name
 output AZURE_SEARCH_SERVICE_ENDPOINT string = backend.outputs.ai_search_endpoint
+output AZURE_RESOURCE_GROUP string = rg.name
 // output AZURE_SEARCH_ADMIN_KEY string = backend.outputs.ai_search_admin_key
 
 

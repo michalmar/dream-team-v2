@@ -22,6 +22,9 @@ param cosmosdbName string
 @description('Name of the Azure Search resource')
 param aiSearchName string
 
+@description('Name of the storage account')
+param storageName string
+
 @secure()
 param appDefinition object
 
@@ -124,7 +127,7 @@ resource cosmosDbContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/c
 
 // Create Storage Account with private endpoint in the default subnet
 resource storageAcct 'Microsoft.Storage/storageAccounts@2021-09-01' = {
-  name: toLower('st${uniqueString(name, location)}')
+  name: storageName
   location: location
   sku: {
     name: 'Standard_LRS'
@@ -194,9 +197,6 @@ resource app 'Microsoft.App/containerApps@2023-05-02-preview' = {
         external: true
         targetPort: 3100
         transport: 'auto'
-      }
-      vnetConfiguration: {
-        infrastructureSubnetId: acaSubnetId // Use the acaSubnetId parameter instead of network module output
       }
       registries: [
         {
@@ -333,7 +333,7 @@ resource openaideploymentembedding 'Microsoft.CognitiveServices/accounts/deploym
   parent: openai
   sku: {
     name: 'Standard'
-    capacity: 99
+    capacity: 15
   }
   properties: {
     model: {
@@ -344,6 +344,7 @@ resource openaideploymentembedding 'Microsoft.CognitiveServices/accounts/deploym
     }
     versionUpgradeOption: 'OnceCurrentVersionExpired'
   }
+  dependsOn: [openaideploymentmini]
 }
 
 resource dynamicsession 'Microsoft.App/sessionPools@2024-02-02-preview' = {

@@ -5,7 +5,8 @@ param tags object = {}
 // Virtual Network configuration
 param vnetAddressPrefix string = '10.0.0.0/16'
 param defaultSubnetPrefix string = '10.0.1.0/24'
-param acaSubnetPrefix string = '10.0.2.0/24'
+// Changed from /24 to /23 to provide at least 512 IP addresses
+param acaSubnetPrefix string = '10.0.2.0/23'
 
 // Add Virtual Network with two subnets: default and aca
 resource vnet 'Microsoft.Network/virtualNetworks@2021-05-01' = {
