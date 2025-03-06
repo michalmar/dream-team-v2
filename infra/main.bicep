@@ -144,6 +144,7 @@ module backend './app/backend.bicep' = {
     defaultSubnetId: network.outputs.defaultSubnetId
     azureOpenaiResourceName: '${abbrs.cognitiveServicesAccounts}${resourceToken}'
     storageName: '${abbrs.storageStorageAccounts}${resourceToken}'
+    vnetId: network.outputs.vnetId
   }
   scope: rg
   dependsOn: [

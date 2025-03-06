@@ -35,6 +35,9 @@ param userPrincipalId string
 param acaSubnetId string
 param defaultSubnetId string
 
+@description('The ID of the target virtual network for private DNS association')
+param vnetId string
+
 var appSettingsArray = filter(array(appDefinition.settings), i => i.name != '')
 var secrets = map(filter(appSettingsArray, i => i.?secret != null), i => {
   name: i.name
@@ -179,6 +182,42 @@ resource peCosmos 'Microsoft.Network/privateEndpoints@2021-05-01' = {
       }
     ]
   }
+}
+
+resource cosmosdbPrivateDnsZone 'Microsoft.Network/privateDnsZones@2024-06-01' = {
+  name: 'privatelink.documents.azure.com'
+  location: 'global'
+}
+
+resource cosmosdbDnsLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01' = {
+  name: 'cosmosdb-dnslink'
+  parent: cosmosdbPrivateDnsZone
+  location: 'global'
+  properties: {
+    virtualNetwork: {
+      id: vnetId
+    }
+    registrationEnabled: false
+  }
+}
+
+resource cosmosdbZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2021-02-01' = {
+  name: 'cosmosdbZoneGroup'
+  parent: peCosmos
+  properties: {
+    privateDnsZoneConfigs: [
+      {
+        name: 'default'
+        properties: {
+          privateDnsZoneId: cosmosdbPrivateDnsZone.id
+        }
+      }
+    ]
+  }
+  dependsOn: [
+    cosmosdbDnsLink
+    peCosmos
+  ]
 }
 
 resource app 'Microsoft.App/containerApps@2023-05-02-preview' = {
