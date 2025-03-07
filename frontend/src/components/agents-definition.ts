@@ -168,7 +168,7 @@ export const agentsTeam2: Agent[] = [
   
   Datasets
   
-  You are provided with detailed datasets for seven transformers (T1001 to T1007). Your task is to analyze these datasets to determine
+  You are provided with detailed datasets for seven transformers (T1001 to T1007). Your task is to analyze these datasets. No additional data needed.
   
   ### Dataset 1: Sensor Data for High‑Pressure G
   
@@ -279,7 +279,7 @@ export const agentsTeam2: Agent[] = [
   
   Reply "TERMINATE" in the end when everything is done.
   `,
-        description:"An agent that monitors sensor streams and detects trends or anomalies for particular device or equipment. Has access to all data needed.",
+        description:"An agent that monitors sensor streams and detects trends or anomalies for particular device or equipment. Agent has access to all necessary data.",
         icon:"🎻",
         index_name:""
         },
@@ -341,7 +341,7 @@ You are Compliance Sentinel, the watchdog for our incident reporting system at W
 
 Datasets
 
-You are provided with detailed datasets. Your task is to analyze these datasets.
+You are provided with detailed datasets. Your task is to analyze these datasets. No additional data needed.
 
 ### Dataset 1: Internal Incident Reports for Well Site (BSEE Incident Reporting)
 
@@ -403,7 +403,7 @@ You are provided with detailed datasets. Your task is to analyze these datasets.
 
 Reply "TERMINATE" in the end when everything is done.
 `,
-      description:"An Compliance agent that compare internal incident reports (BSEE Incident Reporting) and has access to data for Internal Incident Reports for Well Site.",
+      description:"An Compliance agent that compare internal incident reports (BSEE Incident Reporting) and has access to data for Internal Incident Reports for Well Site. Agent has access to all necessary data.",
       icon:"🎻",
       index_name:""
       },
@@ -425,7 +425,7 @@ Reply "TERMINATE" in the end when everything is done.
   
   Datasets
   
-  You are provided with detailed datasets. Your task is to analyze these datasets.
+  You are provided with detailed datasets. Your task is to analyze these datasets. No additional data needed.
   
   ### Dataset 1: Internal Incident Reports for Well Site
   
@@ -542,7 +542,7 @@ Reply "TERMINATE" in the end when everything is done.
   
   Reply "TERMINATE" in the end when everything is done.
   `,
-        description:"An agent that Analyze trends in near misses, safety violations, and environmental events and has access to data for Internal Incident Reports for Well Site and  Regulatory Updates for BSEE, EPA and OSHA.",
+        description:"An agent that Analyze trends in near misses, safety violations, and environmental events and has access to data for Internal Incident Reports for Well Site and  Regulatory Updates for BSEE, EPA and OSHA. Agent has access to all necessary data.",
         icon:"🎻",
         index_name:""
         },
@@ -643,7 +643,7 @@ You are Transaction Trend Analyzer. Your task is to analyze the customer transac
 
 Datasets
 
-You are provided with detailed datasets. Your task is to analyze these datasets.
+You are provided with detailed datasets. Your task is to analyze these datasets. No additional data needed.
 
 ### Dataset 1: Customer profiles
 
@@ -758,7 +758,7 @@ You are provided with detailed datasets. Your task is to analyze these datasets.
 
 Reply "TERMINATE" in the end when everything is done.
 `,
-    description:"An Transaction Trend Analyzer agent, who identifies patterns such as frequent overdrafts and rapid account balance declines. This agent has all data available.",
+    description:"An Transaction Trend Analyzer agent, who identifies patterns such as frequent overdrafts and rapid account balance declines. Agent has access to all necessary data.",
     icon:"🎻",
     index_name:""
     },
@@ -780,7 +780,7 @@ You are Credit Opportunity Recommender. Your role is to integrate the flagged tr
 
 Datasets
 
-You are provided with detailed datasets. Your task is to analyze these datasets.
+You are provided with detailed datasets. Your task is to analyze these datasets. No additional data needed.
 
 ### Dataset 1: Customer profiles
 
@@ -896,7 +896,7 @@ You are provided with detailed datasets. Your task is to analyze these datasets.
 
 Reply "TERMINATE" in the end when everything is done.
 `,
-      description:"An agent integrate the flagged transaction trends with customer profile data from data analysis done by Transaction Trend Analyzer agent. ",
+      description:"An agent integrate the flagged transaction trends with customer profile data from data analysis done by Transaction Trend Analyzer agent. Agent has access to all necessary data.",
       icon:"🎻",
       index_name:""
       },
@@ -950,7 +950,7 @@ You are Inventory Monitor. Your primary responsibility is to continuously analyz
 
 Datasets
 
-You are provided with detailed datasets. Your task is to analyze these datasets.
+You are provided with detailed datasets. Your task is to analyze these datasets. No additional data needed.
 
 ### Dataset 1: Inventory data
 
@@ -1093,7 +1093,7 @@ You are provided with detailed datasets. Your task is to analyze these datasets.
 
 Reply "TERMINATE" in the end when everything is done.
 `,
-    description:" Inventory Monitor. Your primary responsibility is to continuously analyze real‑time inventory data for cinema concessions. This agent has all data available.",
+    description:" Inventory Monitor. Your primary responsibility is to continuously analyze real‑time inventory data for cinema concessions. Agent has access to all necessary data.",
     icon:"🎻",
     index_name:""
     },
@@ -1115,7 +1115,7 @@ You are Sales Analyzer. Your task is to process real‑time sales data from cine
 
 Datasets
 
-You are provided with detailed datasets. Your task is to analyze these datasets.
+You are provided with detailed datasets. Your task is to analyze these datasets. No additional data needed.
 
 ### Dataset 1: Inventory data
 
@@ -1259,7 +1259,7 @@ You are provided with detailed datasets. Your task is to analyze these datasets.
 
 Reply "TERMINATE" in the end when everything is done.
 `,
-      description:"An agent integrate the flagged transaction trends with customer profile data from data analysis done by Transaction Trend Analyzer agent. ",
+      description:"An agent integrate the flagged transaction trends with customer profile data from data analysis done by Transaction Trend Analyzer agent. Agent has access to all necessary data.",
       icon:"🎻",
       index_name:""
       },

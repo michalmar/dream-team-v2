@@ -374,7 +374,7 @@ export default function App() {
                             <AvatarFallback>{getAvatarFallback(message.user)}</AvatarFallback>
                             {/* <Bot className="ml-autoaspect-square h-full w-full" /> */}
                           </Avatar>
-                          <div className="break-all max-w-[100%]">
+                          <div className="break-all max-w-[100%] message">
                             <p className="text-sm font-semibold">{message.user}</p>
                             <MarkdownRenderer markdownText={message.message} />
                             {/* Display image if available */}

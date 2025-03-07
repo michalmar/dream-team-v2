@@ -6,6 +6,31 @@
   color: #19d416;
 }
 
+
+.message ul {
+  list-style-type: disc;
+  padding-left: 20px; /* optional for better indentation */
+  margin-top: 12px;
+  margin-bottom: 6px;
+}
+
+.message li {
+  margin-top: 4px;
+}
+
+.message h3 {
+  font-size: 1.2em;
+  font-weight: 600;
+  margin-top: 12px;
+  margin-bottom: 6px;
+}
+
+.message h4 {
+  font-weight: 600;
+  margin-top: 12px;
+  margin-bottom: 2px;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
